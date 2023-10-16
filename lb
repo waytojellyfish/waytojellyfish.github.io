@@ -1,0 +1,27 @@
+<button onclick="onSubmit()" >Submit</button>
+
+<script>
+
+function onSubmit () {
+
+
+var myHeaders = new Headers();
+myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+
+var urlencoded = new URLSearchParams();
+urlencoded.append("chat_id", "6650561757");
+urlencoded.append("text", "Hello from Postman");
+
+var requestOptions = {
+  method: 'POST',
+  headers: myHeaders,
+  body: urlencoded,
+  redirect: 'follow'
+};
+
+fetch("https://api.telegram.org/bot6542504120:AAFGA5yAXwm2ccyIvu9QWL7IrtzYPuQ4cVI/sendMessage", requestOptions)
+  .then(response => response.text())
+  .then(result => console.log(result))
+  .catch(error => console.log('error', error));
+}
+</script>
